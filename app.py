@@ -1,7 +1,35 @@
-from flask import Flask
+from flask import Flask, render_template
+import json
+import os
 
 app = Flask(__name__)
 
+DATA_DIR = 'data'
+DATA_FILE = os.path.join(DATA_DIR, 'posts.json')
+
+def load_posts():
+    """Reads all posts from the JSON file."""
+    if not os.path.exists(DATA_FILE):
+        return []
+    with open(DATA_FILE, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+def save_posts(posts):
+    """Writes the list of posts to the JSON file."""
+    os.makedirs(DATA_DIR, exist_ok=True)
+    with open(DATA_FILE, 'w', encoding='utf-8') as f:
+        json.dump(posts, f, indent=2, ensure_ascii=False)
+
+def get_next_id(posts):
+    """Determines the next available ID."""
+    if not posts:
+        return 1
+    return max(post['id'] for post in posts) + 1
+
+@app.route('/')
+def index():
+    posts = load_posts()
+    return render_template('index.html', posts=posts)
 
 @app.route('/')
 def hello_world():
