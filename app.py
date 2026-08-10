@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 import json
 import os
 
@@ -30,6 +30,31 @@ def get_next_id(posts):
 def index():
     posts = load_posts()
     return render_template('index.html', posts=posts)
+
+@app.route('/add', methods=['GET', 'POST'])
+def add():
+    if request.method == 'POST':
+        # Extract form data
+        author = request.form.get('author')
+        title = request.form.get('title')
+        content = request.form.get('content')
+
+        # Load all posts, add new post
+        posts = load_posts()
+        new_post = {
+            'id': get_next_id(posts),
+            'author': author,
+            'title': title,
+            'content': content
+        }
+        posts.append(new_post)
+        save_posts(posts)
+
+        # Back to the homepage
+        return redirect(url_for('index'))
+
+    # GET: Display form
+    return render_template('add.html')
 
 @app.route('/')
 def hello_world():
