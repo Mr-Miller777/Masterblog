@@ -67,6 +67,30 @@ def delete(post_id):
     # Back to the homepage
     return redirect(url_for('index'))
 
+@app.route('/update/<int:post_id>', methods=['GET', 'POST'])
+def update(post_id):
+    posts = load_posts()
+    # Find the post with the given ID.
+    post = None
+    for p in posts:
+        if p['id'] == post_id:
+            post = p
+            break
+
+    if post is None:
+        return "Beitrag nicht gefunden", 404
+
+    if request.method == 'POST':
+        # Update the fields with the new values.
+        post['author'] = request.form.get('author')
+        post['title'] = request.form.get('title')
+        post['content'] = request.form.get('content')
+        save_posts(posts)
+        return redirect(url_for('index'))
+
+    # GET: Display form with current data
+    return render_template('update.html', post=post)
+
 @app.route('/')
 def hello_world():
     return 'Hello, World!'
