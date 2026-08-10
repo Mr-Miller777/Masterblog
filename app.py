@@ -56,6 +56,17 @@ def add():
     # GET: Display form
     return render_template('add.html')
 
+@app.route('/delete/<int:post_id>')
+def delete(post_id):
+    # Load all posts
+    posts = load_posts()
+    # Filter out the post with the provided ID.
+    updated_posts = [post for post in posts if post['id'] != post_id]
+    # Save modified list
+    save_posts(updated_posts)
+    # Back to the homepage
+    return redirect(url_for('index'))
+
 @app.route('/')
 def hello_world():
     return 'Hello, World!'
